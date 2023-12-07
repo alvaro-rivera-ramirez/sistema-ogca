@@ -1,0 +1,12 @@
+const {Router}=require("express");
+const surveyRouter=Router();
+const {getAllSurveys,getInfoSurvey,saveSurvey,createAccesUserSurvey, getSurveyToUsers, getSummaryToSurvey}=require("../../controllers/survey.controller");
+const { validateSurveyAvailable } = require("../../middleware/validate.record.middleware");
+const {checkRole}=require("../../middleware/auth.middleware");
+surveyRouter.get('/:code/info',getInfoSurvey);
+surveyRouter.post('/:code/info',validateSurveyAvailable,saveSurvey);
+surveyRouter.get('/:code/users',checkRole([1,2]),getSurveyToUsers);
+surveyRouter.post('/:code/users',checkRole([1,2]),createAccesUserSurvey);
+surveyRouter.get('/',getAllSurveys);
+surveyRouter.get('/summary',getSummaryToSurvey);
+module.exports=surveyRouter;
