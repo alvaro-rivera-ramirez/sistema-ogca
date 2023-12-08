@@ -16,10 +16,40 @@ export const getListIndicator = async (accessToken, page = '', limit = '', searc
   if (search.trim() !== '') {
     url.searchParams.set('search', search);
   }
-
   const config = {
     headers: { Authorization: `Bearer ${accessToken}` },
   };
   const response = await axios.get(url.toString(), config);
   return response.data;
+};
+
+export const createIndicator = async (accessToken, data) => {
+  const config = {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  };
+  return await axios.post(`${API_URL_INDICATOR}`, data, config, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
+};
+
+export const getOneIndicator = async (accessToken, indicatorId) => {
+  const config = {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  };
+  const response = await axios.get(`${API_URL_INDICATOR}/${indicatorId}`, config);
+
+  return response.data;
+};
+
+export const updateIndicator = async (accessToken,indicatorId,data) => {
+  const config = {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  };
+  return await axios.put(`${API_URL_INDICATOR}/${indicatorId}`, data, config, {
+    headers: {
+      'Content-Type': 'application/json',
+    },
+  });
 };

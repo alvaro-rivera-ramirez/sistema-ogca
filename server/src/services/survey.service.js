@@ -79,6 +79,9 @@ const getAllSurveys = (query) => {
     if (module) {
       whereEvaluationModule[Op.or] = [
         {
+          id_evaluation_module: module,
+        },
+        {
           code_evaluation_module: module,
         },
       ];
@@ -155,6 +158,7 @@ const getAllSurveys = (query) => {
           "codeSurvey2",
         ],
         ["allowed_edit_survey", "allowedEdit"],
+        ["status_survey","statusSurvey"]
       ],
       where: whereSurvey,
       offset: parseInt(offset),
@@ -239,13 +243,13 @@ const getMySurveys = (query, userId) =>
             ["content_means_verification", "content"],
           ],
           required: true,
-          include:[
+          include: [
             {
               model: Institutes,
               required: true,
               where: whereInstitute,
-            }
-          ]
+            },
+          ],
         },
         {
           model: Indicators,
@@ -331,7 +335,6 @@ const getInfoSurvey = (code) =>
         }
       );
 
-      console.log(surveyInfo)
       if (!surveyInfo.length) {
         reject({
           code: 404,
@@ -515,33 +518,18 @@ const getInfoSurvey = (code) =>
 
       if (surveyItems.length > 0) {
         itemsList = surveyItems.map((item) => {
-          let itemSurveyList = null;
-          console.log(typeof item.survey_items);
-          if (typeof item.survey_items !== "undefined") {
-            console.log(JSON.stringify(item.survey_items));
-            itemSurveyList = item.survey_items.map(({ value_item }) => {
-              const { rows, valueRecord } = JSON.parse(value_item);
-              return new SurveyItemDTO({
-                rows,
-                valueRecord,
-              }).properties();
-            });
-          } else {
-            itemSurveyList = item.evaluation_module_items[0].list_item.map(
-              ({ rows = [], valueRecord = [] }) =>
-                new SurveyItemDTO({
-                  rows,
-                  valueRecord,
-                }).properties()
-            );
-          }
-
+          const itemSurveyList = !item.survey_item
+            ? []
+            : item.survey_items.map(({ id_survey_item, value_survey_item }) => {
+                return new SurveyItemDTO({
+                  idSurveyItem: id_survey_item,
+                  valueSurveyItem: value_survey_item,
+                }).properties();
+              });
           return new ItemDTO({
             idItem: item.get("idItem"),
             nameItem: item.get("nameItem"),
             typeItem: item.get("typeItem"),
-            columnsGroup: item.evaluation_module_items[0].columns_group ?? [],
-            columnsItem: item.evaluation_module_items[0].columns_item ?? [],
             listItems: itemSurveyList ?? [],
           }).properties();
         });

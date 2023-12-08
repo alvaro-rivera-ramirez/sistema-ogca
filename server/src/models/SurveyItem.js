@@ -9,8 +9,8 @@ const SurveyItem=sequelize.define("survey_item",{
         primaryKey:true,
         autoIncrement:true
     },
-    value_item:{
-        type:DataTypes.JSON,
+    value_survey_item:{
+        type:DataTypes.TEXT,
         allowNull:false,
     },
 },{

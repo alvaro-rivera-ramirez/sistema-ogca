@@ -43,17 +43,8 @@ export default function SurveyInfo({ title, list }) {
         </Stack>
       </Scrollbar>
 
-      {/* <Divider sx={{ borderStyle: 'dashed' }} />
+      {/* <Divider sx={{ borderStyle: 'dashed' }} />*/}
 
-      <Box sx={{ p: 2, textAlign: 'right' }}>
-        <Button
-          size="small"
-          color="inherit"
-          endIcon={<Iconify icon="eva:arrow-ios-forward-fill" />}
-        >
-          View all
-        </Button>
-      </Box> */}
     </Card>
   );
 }
@@ -148,7 +139,7 @@ export function TaskList({ title, list,indexGroupTask,typeGroupTask }) {
 function NewsTask({ news,indexGroupTask,indexTask,typeGroupTask }) {
   const { nameTask:content,statusTask } = news;
   const [anchorEl, setAnchorEl] = useState(null);
-  const [selectedOption, setSelectedOption] = useState(statusTask); // Establecer por 
+  const [selectedOption, setSelectedOption] = useState(statusTask);
   const {deleteTask,updateStatusTask,allowedEdit}=useSurvey();
   const handleClick = (event) => {
     setAnchorEl(event.currentTarget);
@@ -223,3 +214,72 @@ const getIcon = (option) => {
       return null;
   }
 };
+
+export function ItemList({ title, list,indexItem,typeItem }) {
+  const [newValueItem, setNewValueItem] = useState("")
+  const {addSubItem,allowedEdit}=useSurvey();
+  
+  const onNewRowItem=(idItem)=>{
+    if(newValueItem.trim()<1) return;
+    addSubItem(idItem,newValueItem);
+    setNewValueItem("");
+  }
+  return (
+    <Card>
+      <CardHeader title={title} />
+
+      <Scrollbar>
+        <Stack spacing={3} sx={{ p: 3, pr: 0 }}>
+          {list.map((news, index) => (
+            <NewsSubItem key={`newItem${index}`} news={news} indexItem={indexItem} indexSubItem={index} typeItem={typeItem}/>
+          ))}
+        </Stack>
+      </Scrollbar>
+
+      <Divider sx={{ borderStyle: 'dashed' }} />
+      {(typeItem==1 && allowedEdit==1) &&(
+      <Box sx={{ p: 2, textAlign: 'right' }} display="flex" alignItems="center">
+        <TextField id="outlined-basic" placeholder="Escriba aquí" value={newValueItem} onChange={({target})=>{
+          setNewValueItem(target.value)
+        }}/>
+        <Button
+          size="small"
+          color="inherit"
+          endIcon={<Iconify icon="zondicons:add-outline" />}
+          onClick={()=>{
+            onNewRowItem(indexItem)
+          }}
+        >
+          Agregar
+        </Button>
+      </Box>
+
+      )}
+    </Card>
+  );
+}
+
+function NewsSubItem({ news,indexItem,indexSubItem,typeItem }) {
+  const { valueItem:content} = news;
+  const {allowedEdit,deleteSubItem}=useSurvey();
+
+  return (
+    <Stack direction="row" alignItems="center" spacing={2}>
+      <Box sx={{ minWidth: 240, flexGrow: 1 }}>
+        <Typography variant="body2" sx={{ color: 'text.secondary' }}>
+          {content}
+        </Typography>
+      </Box>
+
+      {(typeItem==1 && allowedEdit==1)&&(
+      <IconButton onClick={()=>{
+          deleteSubItem(indexItem,indexSubItem)
+        }}>
+        <DeleteIcon />
+      </IconButton>
+      )}
+      
+    </Stack>
+  );
+}
+

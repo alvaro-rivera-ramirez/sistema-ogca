@@ -10,18 +10,6 @@ const EvaluationModuleItem = sequelize.define(
       type: DataTypes.INTEGER,
       primaryKey: true,
       autoIncrement: true,
-    },
-    list_item:{
-      type:DataTypes.JSON,
-      allowNull:false
-    },
-    columns_item:{
-      type:DataTypes.JSON,
-      allowNull:false
-    },
-    columns_group:{
-      type:DataTypes.JSON,
-      allowNull:false
     }
   },
   {

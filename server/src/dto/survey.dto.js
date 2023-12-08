@@ -145,9 +145,7 @@ class ItemDTO{
       idItem: this.idItem,
       nameItem: this.nameItem,
       typeItem: this.typeItem,
-      columnsGroup: this.columnsGroup||[],
-      columnsItem:this.columnsItem|| [],
-      listItems:this.listItems||[]
+      itemList:this.listItems||[]
     };
   }
 }
@@ -158,8 +156,8 @@ class SurveyItemDTO{
   }
   properties() {
     return {
-      rows:this.rows||[],  
-      valueRecord:this.valueRecord||[]
+      idSurveyItem:this.idSurveyItem,  
+      valueItem:this.valueSurveyItem
     };
   }
 }

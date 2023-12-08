@@ -9,7 +9,7 @@ import TabPanel from '@mui/lab/TabPanel';
 import { useAuth } from 'src/context/AuthProvider';
 import { useSurvey } from 'src/context/SurveyProvider';
 import { getInfoSurvey, sendSurvey } from 'src/utils/fetchSurvey';
-import SurveyInfo, { TaskList } from '../SurveyInfo';
+import SurveyInfo, { ItemList, TaskList } from '../SurveyInfo';
 import { Button, Stack, Typography } from '@mui/material';
 import Iconify from 'src/components/iconify';
 import Swal from 'sweetalert2';
@@ -25,7 +25,6 @@ export default function LabTabs() {
     items,
     taskGroups,
     allowedEdit,
-    getTaskGroup,
     setAllowedEdit,
   } = useSurvey();
   const { accessToken } = useAuth();
@@ -141,6 +140,13 @@ export default function LabTabs() {
                         value={`TabTask${oneTaskGroup.idGroupTask}`}
                       />
                     ))}
+                  {items.length > 0 &&
+                    items.map((oneItem) => (
+                      <Tab key={`tabTask${oneItem.idItem}`}
+                        label={`${oneItem.nameItem}`}
+                        value={`TabItem${oneItem.idItem}`}
+                      />
+                    ))}
                 </TabList>
               </Box>
               <TabPanel value="0">
@@ -164,6 +170,16 @@ export default function LabTabs() {
                     <TaskList title={`${oneTaskGroup.nameGroupTask}`} list={oneTaskGroup.taskList}
                     typeGroupTask={oneTaskGroup.typeGroupTask}
                     indexGroupTask={index}
+                    />
+                  </TabPanel>
+                ))}
+              {items.length > 0 &&
+                items.map((oneItem,index) => (
+                  <TabPanel key={`tabPanelItem${oneItem.idItem}`}
+                    value={`TabItem${oneItem.idItem}`}>
+                    <ItemList title={`${oneItem.nameItem}`} list={oneItem.itemList}
+                    typeItem={oneItem.typeItem}
+                    indexItem={index}
                     />
                   </TabPanel>
                 ))}

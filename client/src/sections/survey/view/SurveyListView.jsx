@@ -88,6 +88,7 @@ export default function SurveyListView() {
   };
 
   const fetchDataSurveys = async () => {
+    
     const { surveys, totalRecords } = await getListSurvey(
       accessToken,
       page,
@@ -122,7 +123,7 @@ export default function SurveyListView() {
             <Table sx={{ minWidth: 800 }}>
               <TableHeader columns={columns} />
               <TableBody>
-                {rowsSurvey.map(({ codeSurvey, codeSurvey2, means_verification,component,indicator,condition, allowedEdit }) => (
+                {rowsSurvey.map(({ codeSurvey, codeSurvey2, means_verification,component,indicator,condition, allowedEdit,statusSurvey }) => (
                   <SurveyTableRow
                     key={codeSurvey}
                     uuidSurvey={codeSurvey}
@@ -133,7 +134,7 @@ export default function SurveyListView() {
                     indicator={indicator.content}
                     condition={condition.content}
                     isSend={!allowedEdit}
-                    status="success"
+                    status={statusSurvey}
                     onOpenModal={handleOpenModalToShare}
                   />
                 ))}

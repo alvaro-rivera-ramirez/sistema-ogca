@@ -66,13 +66,8 @@ export const SurveyContextProvider = ({ children }) => {
   function addSubItem(indexItem, newValueItem) {
     const items = getItems();
     const newItems = [...items];
-    newItems[indexItem].listItems.push({
-      rows: [],
-      valueRecord: [
-        {
-          value: newValueItem,
-        },
-      ],
+    newItems[indexItem].itemList.push({
+      valueItem:newValueItem
     });
     setItems(newItems);
   }
@@ -80,16 +75,17 @@ export const SurveyContextProvider = ({ children }) => {
   function deleteSubItem(indexItem, indexSubItem) {
     const items = getItems();
     const newItems = [...items];
-    newItems[indexItem].listItems.splice(indexSubItem, 1);
+    newItems[indexItem].itemList.splice(indexSubItem, 1);
     setItems(newItems);
   }
 
-  function editSubItem(indexItem,indexSubItem,indexRecordItem,valueRecord){
+  function editSubItem(indexItem,indexSubItem,newValue){
     const items = getItems();
     const newItems = [...items];
-    newItems[indexItem].listItems[indexSubItem].valueRecord[indexRecordItem].value=valueRecord;
+    newItems[indexItem].itemList[indexSubItem].valueItem=newValue;
     setItems(newItems);
   }
+
   function getItems() {
     return items;
   }

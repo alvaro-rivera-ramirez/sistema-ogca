@@ -68,10 +68,10 @@ export default function SurveyTableRow({
         <TableCell>{meansVerification}</TableCell>
         <TableCell>{institute}</TableCell>
 
-        <TableCell align="center">{isSend ? 'Yes' : 'No'}</TableCell>
+        <TableCell align="center">{isSend ? 'Si' : 'No'}</TableCell>
 
         <TableCell>
-          <Label color={(status === 'banned' && 'error') || 'success'}>{status}</Label>
+          <Label color={(status ==0)?'warning':(status==1)?'success':'error'}>{(status ==0)?'Pendiente':(status==1)?'Confirmado':'Observado'}</Label>
         </TableCell>
 
         <TableCell align="right">
@@ -139,5 +139,5 @@ SurveyTableRow.propTypes = {
   indicator: PropTypes.any,
   code: PropTypes.any,
   institute: PropTypes.any,
-  status: PropTypes.string,
+  status: PropTypes.number,
 };

@@ -27,6 +27,11 @@ const Survey=sequelize.define("survey",{
         type:DataTypes.TINYINT(1),
         allowNull:false,
         defaultValue:1
+    },
+    status_survey:{
+        type:DataTypes.TINYINT(1),
+        allowNull:false,
+        defaultValue:0
     }
 },{
     timestamps:false,

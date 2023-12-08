@@ -18,7 +18,23 @@ const EvaluationModule = sequelize.define(
       type:DataTypes.STRING(15),
       allowNull:false,
       unique:true
-    }
+    },
+    dir_attached_file:{
+      type:DataTypes.STRING,
+      allowNull:false,
+      unique:true
+    },
+    desc_attached_file:{
+      type:DataTypes.TEXT,
+      allowNull:false,
+      unique:true
+    },
+    dir_file_module:{
+      type:DataTypes.STRING(100),
+      allowNull:false,
+      unique:true
+    },
+
   },
   {
     timestamps: false,

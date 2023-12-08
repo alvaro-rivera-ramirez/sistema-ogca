@@ -36,6 +36,8 @@ export const getListSurvey = async (
   const config = {
     headers: { Authorization: `Bearer ${accessToken}` },
   };
+
+  console.log(url.toString())
   const response = await axios.get(url.toString(), config);
   return response.data;
 };
