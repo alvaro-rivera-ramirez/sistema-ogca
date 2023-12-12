@@ -22,12 +22,14 @@ const {
   GroupTaskDTO,
   ItemDTO,
   SurveyItemDTO,
+  SurveyFileDTO,
 } = require("../dto/survey.dto");
 const Institutes = require("../models/Institutes");
 const TaskGroup = require("../models/TaskGroup");
 const EvaluationModuleTask = require("../models/EvaluationModuleTask");
 const Item = require("../models/Item");
 const EvaluationModuleItem = require("../models/EvaluationModuleItem");
+const SurveyFile = require("../models/SurveyFile");
 
 const getAllSurveys = (query) => {
   return new Promise(async (resolve, reject) => {
@@ -79,6 +81,9 @@ const getAllSurveys = (query) => {
     if (module) {
       whereEvaluationModule[Op.or] = [
         {
+          id_evaluation_module: module,
+        },
+        {
           code_evaluation_module: module,
         },
       ];
@@ -96,13 +101,11 @@ const getAllSurveys = (query) => {
             ["content_means_verification", "content"],
           ],
           required: true,
-          include: [
-            {
-              model: Institutes,
-              required: true,
-              where: whereInstitute,
-            },
-          ],
+        },
+        {
+          model: Institutes,
+          required: true,
+          where: whereInstitute,
         },
         {
           model: Indicators,
@@ -155,6 +158,7 @@ const getAllSurveys = (query) => {
           "codeSurvey2",
         ],
         ["allowed_edit_survey", "allowedEdit"],
+        ["status_survey","statusSurvey"]
       ],
       where: whereSurvey,
       offset: parseInt(offset),
@@ -239,13 +243,11 @@ const getMySurveys = (query, userId) =>
             ["content_means_verification", "content"],
           ],
           required: true,
-          include:[
-            {
-              model: Institutes,
-              required: true,
-              where: whereInstitute,
-            }
-          ]
+        },
+        {
+          model: Institutes,
+          required: true,
+          where: whereInstitute,
         },
         {
           model: Indicators,
@@ -324,14 +326,13 @@ const getInfoSurvey = (code) =>
   new Promise(async (resolve, reject) => {
     try {
       const surveyInfo = await sequelize.query(
-        "select s.id_survey,hex(s.code_survey) as codeSurvey,s.allowed_edit_survey as allowedEditSurvey,mv.*,i.*,comp.*,cond.*,em.*,ins.* from survey s  INNER JOIN means_verification mv on s.means_verification_id=mv.id_means_verification INNER JOIN institutes ins ON mv.institute_id=ins.id_institute INNER JOIN indicators i on s.indicator_id=i.id_indicator INNER JOIN components comp on s.component_id=comp.id_component INNER JOIN conditions cond on s.condition_id=cond.id_condition INNER JOIN evaluation_module em ON s.evaluation_module_id=em.id_evaluation_module WHERE s.code_survey=UNHEX(lower(:code))",
+        "select s.id_survey,hex(s.code_survey) as codeSurvey,s.allowed_edit_survey as allowedEditSurvey,s.name_item_institute,mv.*,i.*,comp.*,cond.*,em.*,ins.* from survey s  INNER JOIN means_verification mv on s.means_verification_id=mv.id_means_verification INNER JOIN institutes ins ON s.institute_id=ins.id_institute INNER JOIN indicators i on s.indicator_id=i.id_indicator INNER JOIN components comp on s.component_id=comp.id_component INNER JOIN conditions cond on s.condition_id=cond.id_condition INNER JOIN evaluation_module em ON s.evaluation_module_id=em.id_evaluation_module WHERE s.code_survey=UNHEX(lower(:code))",
         {
           replacements: { code },
           type: QueryTypes.SELECT,
         }
       );
 
-      console.log(surveyInfo)
       if (!surveyInfo.length) {
         reject({
           code: 404,
@@ -340,7 +341,7 @@ const getInfoSurvey = (code) =>
         return;
       }
 
-      const { id_evaluation_module } = surveyInfo[0];
+      const { id_evaluation_module,id_survey } = surveyInfo[0];
 
       let surveyItems = await Item.findAll({
         attributes: [
@@ -364,7 +365,8 @@ const getInfoSurvey = (code) =>
                   ],
                 ],
                 where: {
-                  code_survey: Sequelize.fn("UNHEX", code),
+                  // code_survey: Sequelize.fn("UNHEX", code),
+                  id_survey:id_survey
                 },
               },
             ],
@@ -401,12 +403,20 @@ const getInfoSurvey = (code) =>
                   ],
                 ],
                 where: {
-                  code_survey: Sequelize.fn("UNHEX", code),
+                  id_survey:id_survey
+                  // code_survey: Sequelize.fn("UNHEX", code),
                 },
               },
             ],
           },
         ],
+      });
+
+
+      const surveyFiles=await SurveyFile.findAll({
+        where:{
+          survey_id:id_survey
+        }
       });
 
       if (!surveyItems.length) {
@@ -491,6 +501,20 @@ const getInfoSurvey = (code) =>
       const institution = new InstituteDTO(propsInstitute);
       let taskList = null;
       let itemsList = null;
+      let fileList=null;
+
+      if(surveyFiles.length>0){
+        fileList=surveyFiles.map((file)=>
+          new SurveyFileDTO(
+            {
+              idSurveyFile:file.id_survey_file,
+              dirFile:file.dir_survey_file.split('/').pop(),
+              nameFile:file.name_survey_file  
+            }
+          ).properties()
+        )
+        console.log(fileList)
+      }
 
       if (surveyTasks.length > 0) {
         taskList = surveyTasks.map((taskGroup) => {
@@ -515,33 +539,18 @@ const getInfoSurvey = (code) =>
 
       if (surveyItems.length > 0) {
         itemsList = surveyItems.map((item) => {
-          let itemSurveyList = null;
-          console.log(typeof item.survey_items);
-          if (typeof item.survey_items !== "undefined") {
-            console.log(JSON.stringify(item.survey_items));
-            itemSurveyList = item.survey_items.map(({ value_item }) => {
-              const { rows, valueRecord } = JSON.parse(value_item);
-              return new SurveyItemDTO({
-                rows,
-                valueRecord,
-              }).properties();
-            });
-          } else {
-            itemSurveyList = item.evaluation_module_items[0].list_item.map(
-              ({ rows = [], valueRecord = [] }) =>
-                new SurveyItemDTO({
-                  rows,
-                  valueRecord,
-                }).properties()
-            );
-          }
-
+          const itemSurveyList = !item.survey_item
+            ? []
+            : item.survey_items.map(({ id_survey_item, value_survey_item }) => {
+                return new SurveyItemDTO({
+                  idSurveyItem: id_survey_item,
+                  valueSurveyItem: value_survey_item,
+                }).properties();
+              });
           return new ItemDTO({
             idItem: item.get("idItem"),
             nameItem: item.get("nameItem"),
             typeItem: item.get("typeItem"),
-            columnsGroup: item.evaluation_module_items[0].columns_group ?? [],
-            columnsItem: item.evaluation_module_items[0].columns_item ?? [],
             listItems: itemSurveyList ?? [],
           }).properties();
         });
@@ -555,6 +564,7 @@ const getInfoSurvey = (code) =>
         meansVerification,
         task: taskList ?? [],
         items: itemsList ?? [],
+        fileList:fileList??[],
         codeSurvey: surveyInfoObject.codeSurvey,
         allowedEdit: surveyInfoObject.allowedEditSurvey,
         institution,
@@ -614,7 +624,7 @@ const sumaryByEvaluationModule = (query) =>
       if (module) {
         whereEvaluationModule[Op.or] = [
           {
-            code_evaluation_module: module,
+            id_evaluation_module: module,
           },
         ];
       }
@@ -635,7 +645,7 @@ const sumaryByEvaluationModule = (query) =>
               Sequelize.fn(
                 "SUM",
                 Sequelize.literal(
-                  "CASE WHEN allowed_edit_survey=1 THEN 1 ELSE 0 END"
+                  "CASE WHEN status_survey=0 THEN 1 ELSE 0 END"
                 )
               ),
               0
@@ -648,12 +658,25 @@ const sumaryByEvaluationModule = (query) =>
               Sequelize.fn(
                 "SUM",
                 Sequelize.literal(
-                  "CASE WHEN allowed_edit_survey=0 THEN 1 ELSE 0 END"
+                  "CASE WHEN status_survey=2 THEN 1 ELSE 0 END"
                 )
               ),
               0
             ),
-            "enviadas",
+            "observadas",
+          ],
+          [
+            Sequelize.fn(
+              "COALESCE",
+              Sequelize.fn(
+                "SUM",
+                Sequelize.literal(
+                  "CASE WHEN status_survey=1 THEN 1 ELSE 0 END"
+                )
+              ),
+              0
+            ),
+            "confirmadas",
           ],
         ],
         include: [
@@ -676,26 +699,34 @@ const sumaryByEvaluationModuleToUser = (query, userId) =>
   new Promise(async (resolve, reject) => {
     try {
       const { module = null } = query;
+      console.log(module)
       const whereEvaluationModule = {};
 
       if (module) {
         whereEvaluationModule[Op.or] = [
           {
-            code_evaluation_module: module,
+            id_evaluation_module: module,
           },
         ];
       }
 
       const sumary = await Survey.findOne({
         attributes: [
-          [Sequelize.fn("COALESCE", Sequelize.fn("COUNT", "*"), 0), "total"],
+          [
+            Sequelize.fn(
+              "COALESCE",
+              Sequelize.fn("COUNT", Sequelize.literal("*")),
+              0
+            ),
+            "total",
+          ],
           [
             Sequelize.fn(
               "COALESCE",
               Sequelize.fn(
                 "SUM",
                 Sequelize.literal(
-                  "CASE WHEN survey.allowed_edit_survey=1 THEN 1 ELSE 0 END"
+                  "CASE WHEN status_survey=0 THEN 1 ELSE 0 END"
                 )
               ),
               0
@@ -708,12 +739,25 @@ const sumaryByEvaluationModuleToUser = (query, userId) =>
               Sequelize.fn(
                 "SUM",
                 Sequelize.literal(
-                  "CASE WHEN survey.allowed_edit_survey=0 THEN 1 ELSE 0 END"
+                  "CASE WHEN status_survey=2 THEN 1 ELSE 0 END"
                 )
               ),
               0
             ),
-            "enviadas",
+            "observadas",
+          ],
+          [
+            Sequelize.fn(
+              "COALESCE",
+              Sequelize.fn(
+                "SUM",
+                Sequelize.literal(
+                  "CASE WHEN status_survey=1 THEN 1 ELSE 0 END"
+                )
+              ),
+              0
+            ),
+            "confirmadas",
           ],
         ],
         include: [
@@ -776,6 +820,8 @@ const createTaskSurvey = (tasks, surveyId, transaction) =>
       reject(error);
     }
   });
+
+
 module.exports = {
   createSurvey,
   createTaskSurvey,

@@ -4,6 +4,7 @@ const SurveyContext = createContext({
   surveyInfo: {},
   taskGroups: {},
   items: {},
+  files:{},
   allowedEdit:1,
   setAllowedEdit:()=>{},
   createSurveyInfo: (survey) => {},
@@ -11,6 +12,8 @@ const SurveyContext = createContext({
   createItems: (newItem) => {},
   getTaskGroup: () => {},
   getItems: () => {},
+  addFile:(newFiles)=>{},
+  deleteFile:(file)=>{},
   addSubItem: (indexItem, newValueItem) => {},
   deleteSubItem: (indexItem, indexSubItem) => {},
   editSubItem: (indexItem, indexSubItem,indexRecordItem,valueRecord) => {},
@@ -23,6 +26,7 @@ export const SurveyContextProvider = ({ children }) => {
   const [surveyInfo, setSurveyInfo] = useState({});
   const [taskGroups, setTaskGroups] = useState([]);
   const [allowedEdit, setAllowedEdit] = useState(1)
+  const [files, setFiles] = useState([]);
   const [items, setItems] = useState([]);
 
   function createSurveyInfo(newSurvey) {
@@ -66,13 +70,8 @@ export const SurveyContextProvider = ({ children }) => {
   function addSubItem(indexItem, newValueItem) {
     const items = getItems();
     const newItems = [...items];
-    newItems[indexItem].listItems.push({
-      rows: [],
-      valueRecord: [
-        {
-          value: newValueItem,
-        },
-      ],
+    newItems[indexItem].itemList.push({
+      valueItem:newValueItem
     });
     setItems(newItems);
   }
@@ -80,20 +79,45 @@ export const SurveyContextProvider = ({ children }) => {
   function deleteSubItem(indexItem, indexSubItem) {
     const items = getItems();
     const newItems = [...items];
-    newItems[indexItem].listItems.splice(indexSubItem, 1);
+    newItems[indexItem].itemList.splice(indexSubItem, 1);
+    setItems(newItems);
+  }
+  function addFile( newFiles) {
+    const fileList = getFiles();
+    console.log(newFiles)
+    const newFileList = [...fileList,...Array.from(newFiles)];
+    setFiles(newFileList );
+  }
+  
+  function addMultipleFile( newFiles) {
+    const fileList = getFiles();
+    const newFileList = [...fileList,...newFiles];
+    setFiles(newFileList );
+  }
+
+  function deleteFile(file) {
+    const fileList = getFiles();
+    const newFileList = [...fileList];
+    console.log(file)
+    console.log(fileList.indexOf(file))
+    newFileList.splice(fileList.indexOf(file), 1);
+    setFiles(newFileList);
+  }
+
+  function editSubItem(indexItem,indexSubItem,newValue){
+    const items = getItems();
+    const newItems = [...items];
+    newItems[indexItem].itemList[indexSubItem].valueItem=newValue;
     setItems(newItems);
   }
 
-  function editSubItem(indexItem,indexSubItem,indexRecordItem,valueRecord){
-    const items = getItems();
-    const newItems = [...items];
-    newItems[indexItem].listItems[indexSubItem].valueRecord[indexRecordItem].value=valueRecord;
-    setItems(newItems);
-  }
   function getItems() {
     return items;
   }
 
+  function getFiles(){
+    return files;
+  }
   function createItems(newItems) {
     setItems(newItems);
   }
@@ -104,6 +128,7 @@ export const SurveyContextProvider = ({ children }) => {
         surveyInfo,
         taskGroups,
         items,
+        files,
         allowedEdit,
         createSurveyInfo,
         createTaskGroup,
@@ -116,7 +141,10 @@ export const SurveyContextProvider = ({ children }) => {
         addTask,
         deleteTask,
         updateStatusTask,
-        setAllowedEdit
+        setAllowedEdit,
+        addFile,
+        addMultipleFile,
+        deleteFile
       }}
     >
       {children}

@@ -1,7 +1,7 @@
 import axios from 'axios';
 import { API_URL } from '../constants';
 
-const API_URL_MEANSVERIFICATION = `${API_URL}/v1/means-verification`;
+const API_URL_MEANSVERIFICATION = `${API_URL}/v1/mv`;
 export const getListMeansVerification = async (accessToken, page = '', limit = '', search = '') => {
   let url = new URL(API_URL_MEANSVERIFICATION);
 

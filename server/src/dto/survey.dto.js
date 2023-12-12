@@ -16,7 +16,8 @@ class SurveyViewDTO {
       checkitem: this.meansVerification || null,
       responsibleInstitute: this.institution || null,
       taskGroup: this.task || [],
-      items:this.items||[]
+      items:this.items||[],
+      files:this.fileList||[]
     };
   }
   
@@ -145,9 +146,7 @@ class ItemDTO{
       idItem: this.idItem,
       nameItem: this.nameItem,
       typeItem: this.typeItem,
-      columnsGroup: this.columnsGroup||[],
-      columnsItem:this.columnsItem|| [],
-      listItems:this.listItems||[]
+      itemList:this.listItems||[]
     };
   }
 }
@@ -158,8 +157,22 @@ class SurveyItemDTO{
   }
   properties() {
     return {
-      rows:this.rows||[],  
-      valueRecord:this.valueRecord||[]
+      idSurveyItem:this.idSurveyItem,  
+      valueItem:this.valueSurveyItem
+    };
+  }
+}
+
+
+class SurveyFileDTO{
+  constructor(props) {
+    Object.assign(this, props);
+  }
+  properties() {
+    return {
+      idSurveyFile:this.idSurveyFile,
+      dirFile:this.dirFile,
+      nameFile:this.nameFile  
     };
   }
 }
@@ -175,5 +188,6 @@ module.exports = {
   GroupTaskDTO,
   InstituteDTO,
   ItemDTO,
-  SurveyItemDTO
+  SurveyItemDTO,
+  SurveyFileDTO
 };

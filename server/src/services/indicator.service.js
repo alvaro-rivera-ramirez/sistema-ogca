@@ -4,7 +4,7 @@ const Indicator = require("../models/Indicators");
 const getAllIndicator = (query) => {
   return new Promise(async (resolve, reject) => {
     try {
-      const { page = 1, limit = 10, search } = query;
+      const { page = 1, limit = 10, search="" } = query;
 
       const whereIndicator = {};
 

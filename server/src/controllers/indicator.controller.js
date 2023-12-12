@@ -57,7 +57,7 @@ const updateIndicator=async(req,res)=>{
         const {indicatorId}=req.params;
 
         const dataIndicator={
-            content_indicator:content,
+            content_indicator:content
         }
         await IndicatorService.updateIndicator(indicatorId,dataIndicator,transaction);
 

@@ -18,102 +18,67 @@ import AppConversionRates from '../app-conversion-rates';
 import { useEffect, useState } from 'react';
 import { getSummarySurvey } from 'src/utils/fetchSurvey';
 import { useAuth } from 'src/context/AuthProvider';
-
+import { default as SurveyListView } from 'src/sections/survey/view/SurveyListView';
+import { useSurvey } from 'src/context/ListSurveyContext';
 // ----------------------------------------------------------------------
 
 export default function AppView() {
   const [estado, setEstado] = useState('');
   const [cargando, setCargando] = useState(true);
-  const {accessToken}=useAuth();
+  const { accessToken } = useAuth();
+  const {module}=useSurvey();
   async function fetchSummarySurvey() {
     try {
-      const { total, pendientes, enviadas } = await getSummarySurvey();
-      setEstado({ total, pendientes, enviadas });
+      const { total, pendientes, confirmadas, observadas } = await getSummarySurvey(accessToken,module);
+      console.log(total)
+      setEstado({ total, pendientes, confirmadas, observadas });
     } catch (error) {
       console.log(error);
     }
   }
   useEffect(() => {
-  
     fetchSummarySurvey();
-  }, []);
+  }, [module]);
   return (
     <Container maxWidth="xl">
-      {/* <Typography variant="h4" sx={{ mb: 5 }}>
-        Hi, Welcome back 👋
-      </Typography> */}
+      <Typography variant="h4" sx={{ mb: 2 }}>
+        Panel principal
+      </Typography>
 
-      <Grid container spacing={3}>
+      <Grid container spacing={3} marginBottom={2}>
         <Grid xs={12} sm={6} md={3}>
           <AppWidgetSummary
-            title="Weekly Sales"
-            total={714000}
-            color="success"
-            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_bag.png" />}
-          />
-        </Grid>
-
-        <Grid xs={12} sm={6} md={3}>
-          <AppWidgetSummary
-            title="New Users"
-            total={1352831}
+            title="Total de fichas"
+            total={parseInt(estado.total)}
             color="info"
-            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_users.png" />}
+            icon={<img alt="icon" src="/assets/icons/files/total-fichas.png" />}
           />
         </Grid>
-
         <Grid xs={12} sm={6} md={3}>
           <AppWidgetSummary
-            title="Item Orders"
-            total={1723315}
-            color="warning"
-            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_buy.png" />}
-          />
-        </Grid>
-
-        <Grid xs={12} sm={6} md={3}>
-          <AppWidgetSummary
-            title="Bug Reports"
-            total={234}
-            color="error"
-            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_message.png" />}
-          />
-        </Grid>
-        {/* <Grid xs={12} sm={6} md={3}>
-          <AppWidgetSummary
-            title="Weekly Sales"
-            total={714000}
+            title="Fichas confirmadas"
+            total={estado.confirmadas}
             color="success"
-            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_bag.png" />}
+            icon={<img alt="icon" src="/assets/icons/files/ficha-confirmada.png" />}
           />
         </Grid>
-
         <Grid xs={12} sm={6} md={3}>
           <AppWidgetSummary
-            title="New Users"
-            total={1352831}
-            color="info"
-            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_users.png" />}
-          />
-        </Grid>
-
-        <Grid xs={12} sm={6} md={3}>
-          <AppWidgetSummary
-            title="Item Orders"
-            total={1723315}
+            title="Fichas pendientes"
+            total={estado.pendientes}
             color="warning"
-            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_buy.png" />}
+            icon={<img alt="icon" src="/assets/icons/files/file-pending.png" />}
           />
         </Grid>
 
         <Grid xs={12} sm={6} md={3}>
           <AppWidgetSummary
-            title="Bug Reports"
-            total={234}
+            title="Fichas observadas"
+            total={estado.observadas}
             color="error"
-            icon={<img alt="icon" src="/assets/icons/glass/ic_glass_message.png" />}
+            icon={<img alt="icon" src="/assets/icons/files/file-warning.png" />}
           />
-        </Grid> */}
+        </Grid>
 
         {/* <Grid xs={12} md={6} lg={8}>
           <AppWebsiteVisits
@@ -278,6 +243,7 @@ export default function AppView() {
           />
         </Grid> */}
       </Grid>
+      <SurveyListView />
     </Container>
   );
 }

@@ -18,6 +18,17 @@ const getAllModules=async(req,res)=>{
     }
 };
 
+const getSchema=async(req,res)=>{
+    try {
+        const {moduleId}=req.params;
+
+        const schema=await EvaluationModuleService.getSchemaModule(moduleId);
+        res.json(schema);
+    } catch (error) {
+        handleHttpError(res,error);
+    }
+}
 module.exports={
     getAllModules,
+    getSchema
 }

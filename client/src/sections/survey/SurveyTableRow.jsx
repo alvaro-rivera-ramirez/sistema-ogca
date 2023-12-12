@@ -12,7 +12,7 @@ import { styled } from '@mui/material/styles';
 import Tooltip, { tooltipClasses } from '@mui/material/Tooltip';
 import Label from 'src/components/label';
 import Iconify from 'src/components/iconify';
-import { Link, Navigate } from "react-router-dom";
+import { Link, Navigate } from 'react-router-dom';
 import { useRouter } from 'src/routes/hooks';
 
 // ----------------------------------------------------------------------
@@ -39,7 +39,7 @@ export default function SurveyTableRow({
   institute,
   isSend,
   status,
-  onOpenModal
+  handleOpenModal,
 }) {
   const [open, setOpen] = useState(null);
   const router = useRouter();
@@ -51,16 +51,15 @@ export default function SurveyTableRow({
     setOpen(null);
   };
 
-  const handleShareSurvey=(code)=>{
-    onOpenModal(code)
+  const handleOptionRow = (option, uuid) => {
+    handleOpenModal(option, uuid);
     handleCloseMenu();
-  }
+  };
 
-  const handleViewSurvey=(code)=>{
+  const handleViewSurvey = (code) => {
     handleCloseMenu();
     router.push(`/ficha?code=${code}`);
-    // return <Navigate to={`/survey?code=${code}`}/>
-  }
+  };
   return (
     <>
       <TableRow hover tabIndex={-1}>
@@ -68,10 +67,12 @@ export default function SurveyTableRow({
         <TableCell>{meansVerification}</TableCell>
         <TableCell>{institute}</TableCell>
 
-        <TableCell align="center">{isSend ? 'Yes' : 'No'}</TableCell>
+        <TableCell align="center">{isSend ? 'Si' : 'No'}</TableCell>
 
         <TableCell>
-          <Label color={(status === 'banned' && 'error') || 'success'}>{status}</Label>
+          <Label color={status == 0 ? 'warning' : status == 1 ? 'success' : 'error'}>
+            {status == 0 ? 'Pendiente' : status == 1 ? 'Confirmado' : 'Observado'}
+          </Label>
         </TableCell>
 
         <TableCell align="right">
@@ -109,15 +110,15 @@ export default function SurveyTableRow({
         anchorOrigin={{ vertical: 'top', horizontal: 'left' }}
         transformOrigin={{ vertical: 'top', horizontal: 'right' }}
       >
-        <MenuItem onClick={()=> handleShareSurvey(uuidSurvey)}>
+        <MenuItem onClick={() => handleOptionRow('COMPARTIR', uuidSurvey)}>
           <Iconify icon="material-symbols:share-outline" sx={{ mr: 2 }} />
           Share
         </MenuItem>
-        <MenuItem onClick={()=>handleViewSurvey(uuidSurvey)}>
+        <MenuItem onClick={() => handleViewSurvey(uuidSurvey)}>
           <Iconify icon="carbon:view-filled" sx={{ mr: 2 }} />
           Ver
         </MenuItem>
-        <MenuItem onClick={handleCloseMenu}>
+        <MenuItem onClick={() => handleOptionRow('EDITAR', uuidSurvey)}>
           <Iconify icon="eva:edit-fill" sx={{ mr: 2 }} />
           Editar
         </MenuItem>
@@ -139,5 +140,5 @@ SurveyTableRow.propTypes = {
   indicator: PropTypes.any,
   code: PropTypes.any,
   institute: PropTypes.any,
-  status: PropTypes.string,
+  status: PropTypes.number,
 };

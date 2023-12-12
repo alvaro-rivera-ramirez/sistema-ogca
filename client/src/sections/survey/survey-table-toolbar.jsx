@@ -9,11 +9,11 @@ import InputAdornment from '@mui/material/InputAdornment';
 import TextField from '@mui/material/TextField';
 import Autocomplete from '@mui/material/Autocomplete';
 import Iconify from 'src/components/iconify';
-import { useState,useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { useAuth } from 'src/context/AuthProvider';
 import { useSurvey } from 'src/context/ListSurveyContext';
-import {getListInstitute} from '../../utils/fetchInstitute'
-import {getListModel} from '../../utils/fetchModelEval'
+import { getListInstitute } from '../../utils/fetchInstitute';
+import { getListModel } from '../../utils/fetchModelEval';
 import { Box } from '@mui/material';
 // ----------------------------------------------------------------------
 
@@ -22,25 +22,24 @@ export default function SurveyTableToolbar() {
   const [itemModule, setItemModule] = useState([]);
   const { accessToken } = useAuth();
   const { search, itemsChange } = useSurvey();
-  const handleChange = ({target}) => {
+  const handleChange = ({ target }) => {
     const id = target.id;
-    return itemsChange[id](target.value) || itemsChange["default"];
+    return itemsChange[id](target.value) || itemsChange['default'];
   };
 
   useEffect(() => {
     async function fetchDataInstitute() {
-      const dataInstitute = await getListInstitute(accessToken); 
+      const dataInstitute = await getListInstitute(accessToken);
       setItemInstitute([...dataInstitute]);
     }
 
     async function fetchDataModule() {
-      const dataModuleEval=await getListModel(accessToken);
+      const dataModuleEval = await getListModel(accessToken);
       setItemModule([...dataModuleEval]);
     }
 
     fetchDataInstitute();
     fetchDataModule();
-
   }, []);
   return (
     <Toolbar
@@ -52,7 +51,8 @@ export default function SurveyTableToolbar() {
       }}
     >
       <OutlinedInput
-      id='input-search'
+        id="input-search"
+        key={"input-search"}
         value={search}
         onChange={handleChange}
         placeholder="Search survey..."
@@ -61,58 +61,51 @@ export default function SurveyTableToolbar() {
             <Iconify
               icon="eva:search-fill"
               sx={{ color: 'text.disabled', width: 20, height: 20 }}
-              />
+            />
           </InputAdornment>
         }
-        />
+      />
 
       <Autocomplete
-      multiple={false}
-        onChange={({target})=>{
-          console.log(target)
-          handleChange({target:{id:"itemInstitute",value:target.value}})
+        multiple={false}
+        key={'filterInstitute'}
+        onChange={({ target }) => {
+          console.log(target.value)
+          handleChange({ target: { id: 'itemInstitute', value: target.value } });
         }}
-        noOptionsText={"No se ha encontrado dependencias"}
+        noOptionsText={'No se ha encontrado dependencias'}
         id="itemInstitute"
         options={itemInstitute}
         includeInputInList
         sx={{ width: 300 }}
-        isOptionEqualToValue={(option,value)=>option.name===value.name}
-        getOptionLabel={({name}) => `${name}`}
-        renderInput={(params) => <TextField {...params} name='dependencia' label="Dependencia" />}
+        isOptionEqualToValue={(option, value) => option.name === value.name}
+        getOptionLabel={({ name }) => `${name}`}
+        renderInput={(params) => <TextField {...params} name="dependencia" label="Dependencia" />}
         renderOption={(props, result) => (
-          <Box
-          component="li"
-          {...props}
-          key={result.id}
-          value={result.id}
-          >
+          <Box component="li" {...props} key={`institute${result.id}`} value={result.id}>
             {result.name}
           </Box>
         )}
-        />
+      />
       <Autocomplete
-       onChange={({target})=>{
-        handleChange({target:{id:"itemModule",value:target.value}})
-      }}
-      noOptionsText={"No se ha encontrado dependencias"}
-      id="itemModule"
-      options={itemModule}
-      includeInputInList
-      sx={{ width: 300 }}
-      isOptionEqualToValue={(option,value)=>option.name===value.name}
-      getOptionLabel={({name}) => `${name}`}
-      renderInput={(params) => <TextField {...params} label="Modelo de evaluación" />}
-      renderOption={(props, result) => (
-        <Box
-        component="li"
-        {...props}
-        key={result.id}
-        value={result.id}
-        >
-          {result.name}
-        </Box>
-      )}
+        multiple={false}
+        id="itemModule"
+        key={'filterModule'}
+        options={itemModule}
+        onChange={({ target }) => {
+          handleChange({ target: { id: 'itemModule', value: target.value } });
+        }}
+        noOptionsText={'No se ha encontrado modelos'}
+        includeInputInList
+        sx={{ width: 300 }}
+        isOptionEqualToValue={(option, value) => option.name === value.name}
+        getOptionLabel={({ name }) => `${name}`}
+        renderInput={(params) => <TextField {...params} label="Modelo de evaluación" />}
+        renderOption={(props, result) => (
+          <Box component="li" {...props} key={`module${result.id}`} value={result.id}>
+            {result.name}
+          </Box>
+        )}
       />
     </Toolbar>
   );
