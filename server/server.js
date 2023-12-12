@@ -28,7 +28,11 @@ class Server {
   middlewares() {}
 
   routes() {
+    this.app.use(express.static(path.join(__dirname, "out")));
     this.app.use("/api", APP_ROUTES);
+    this.app.get('*', (req, res) => {
+      res.sendFile(path.join(__dirname,"out", 'index.html'));
+    });
   }
 
   listen() {

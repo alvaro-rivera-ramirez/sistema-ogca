@@ -1,0 +1,1 @@
+import{n as t}from"./numeral-d203629f.js";function a(r){const n=r?t(r).format("$0,0.00"):"";return e(n,".00")}function c(r){const n=r?t(r).format("0.00a"):"";return e(n,".00")}function e(r,n=".00"){return r.includes(n)?r.replace(n,""):r}export{a,c as f};
