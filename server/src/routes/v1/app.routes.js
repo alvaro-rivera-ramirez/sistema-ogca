@@ -9,6 +9,8 @@ const conditionRouter=require("./condition.routes");
 const instituteRouter=require("./institute.routes");
 const sessionRouter=require("./session.routes");
 const evaluationModuleRouter=require("./evaluation.module.routes");
+const meansVerificationRouter=require("./means.verification.routes");
+
 const {checkAuth}=require("../../middleware/auth.middleware");
 
 router.use('/task',taskRouter);
@@ -19,6 +21,7 @@ router.use('/component',checkAuth,componentRouter);
 router.use('/condition',checkAuth,conditionRouter);
 router.use('/institute',checkAuth,instituteRouter);
 router.use('/evaluation-module',checkAuth,evaluationModuleRouter);
+router.use('/mv',checkAuth,meansVerificationRouter);
 router.use('/session',sessionRouter);
 
 module.exports=router;

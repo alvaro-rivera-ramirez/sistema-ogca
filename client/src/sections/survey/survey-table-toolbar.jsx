@@ -24,7 +24,6 @@ export default function SurveyTableToolbar() {
   const { search, itemsChange } = useSurvey();
   const handleChange = ({ target }) => {
     const id = target.id;
-    console.log(target);
     return itemsChange[id](target.value) || itemsChange['default'];
   };
 
@@ -96,7 +95,7 @@ export default function SurveyTableToolbar() {
         onChange={({ target }) => {
           handleChange({ target: { id: 'itemModule', value: target.value } });
         }}
-        noOptionsText={'No se ha encontrado dependencias'}
+        noOptionsText={'No se ha encontrado modelos'}
         includeInputInList
         sx={{ width: 300 }}
         isOptionEqualToValue={(option, value) => option.name === value.name}

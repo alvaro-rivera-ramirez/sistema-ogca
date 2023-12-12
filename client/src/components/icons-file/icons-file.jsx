@@ -13,7 +13,7 @@ export const navConfigAdmin = [
     icon: icon('ic_analytics'),
   },
   {
-    title: 'usuarios',
+    title: 'user',
     path: '/user',
     icon: icon('ic_user'),
   },

@@ -47,7 +47,11 @@ export default function Router() {
         </RequireAuth>
       ),
       children: [
-        { element: <IndexPage />, index: true },
+        { element: 
+          <SurveyListContextProvider>
+            <IndexPage />
+          </SurveyListContextProvider>
+        , index: true },
         { path: 'blog', element: <BlogPage /> },
         {
           path: 'ficha',

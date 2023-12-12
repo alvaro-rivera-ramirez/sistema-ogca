@@ -22,16 +22,16 @@ import Scrollbar from 'src/components/scrollbar';
 
 import { NAV } from './config-layout';
 import navConfig from './config-navigation';
-import {navConfigAdmin,navConfigUser} from './config-navigation2';
+import { navConfigAdmin, navConfigUser } from './config-navigation2';
 import { useAuth } from 'src/context/AuthProvider';
-import {ROLE} from '../../constants'
+import { ROLE } from '../../constants';
 // ----------------------------------------------------------------------
 
 export default function Nav({ openNav, onCloseNav }) {
   const pathname = usePathname();
 
   const upLg = useResponsive('up', 'lg');
- const{user}=useAuth();
+  const { user } = useAuth();
   useEffect(() => {
     if (openNav) {
       onCloseNav();
@@ -58,26 +58,23 @@ export default function Nav({ openNav, onCloseNav }) {
         <Typography variant="subtitle2">{user.name}</Typography>
 
         <Typography variant="body2" sx={{ color: 'text.secondary' }}>
-          {user.role==ROLE.ADMINISTRADOR?"Administrador":"Usuario"}
+          {user.role == ROLE.ADMINISTRADOR ? 'Administrador' : 'Usuario'}
         </Typography>
       </Box>
     </Box>
   );
 
-  const renderMenu = ()=>{
-    const {user}=useAuth();    
-return (
-    <Stack component="nav" spacing={0.5} sx={{ px: 2 }}>
-      {user.role==ROLE.ADMINISTRADOR && (navConfigAdmin.map((item) => (
-        <NavItem key={item.title} item={item} />
-      )))}
-      {user.role==ROLE.USUARIO && navConfigUser.map((item) => (
-        <NavItem key={item.title} item={item} />
-      ))}
-    </Stack>
-
-    )
-  }
+  const renderMenu = () => {
+    const { user } = useAuth();
+    return (
+      <Stack component="nav" spacing={0.5} sx={{ px: 2 }}>
+        {user.role == ROLE.ADMINISTRADOR &&
+          navConfigAdmin.map((item) => <NavItem key={item.title} item={item} />)}
+        {user.role == ROLE.USUARIO &&
+          navConfigUser.map((item) => <NavItem key={item.title} item={item} />)}
+      </Stack>
+    );
+  };
 
   const renderContent = (
     <Scrollbar
@@ -97,7 +94,6 @@ return (
       {renderMenu()}
 
       <Box sx={{ flexGrow: 1 }} />
-
     </Scrollbar>
   );
 

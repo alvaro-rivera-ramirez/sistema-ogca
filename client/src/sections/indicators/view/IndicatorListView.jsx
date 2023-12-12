@@ -83,9 +83,7 @@ export default function IndicatorListView() {
       setOpenModal(true);
     }
     if (typeForm == 'ELIMINAR') {
-    }
-
-    
+    } 
   };
 
   const handleCloseModal = () => {

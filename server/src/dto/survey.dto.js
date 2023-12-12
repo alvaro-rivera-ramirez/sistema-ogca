@@ -16,7 +16,8 @@ class SurveyViewDTO {
       checkitem: this.meansVerification || null,
       responsibleInstitute: this.institution || null,
       taskGroup: this.task || [],
-      items:this.items||[]
+      items:this.items||[],
+      files:this.fileList||[]
     };
   }
   
@@ -162,6 +163,20 @@ class SurveyItemDTO{
   }
 }
 
+
+class SurveyFileDTO{
+  constructor(props) {
+    Object.assign(this, props);
+  }
+  properties() {
+    return {
+      idSurveyFile:this.idSurveyFile,
+      dirFile:this.dirFile,
+      nameFile:this.nameFile  
+    };
+  }
+}
+
 module.exports = {
   SurveyViewDTO,
   ModuleDTO,
@@ -173,5 +188,6 @@ module.exports = {
   GroupTaskDTO,
   InstituteDTO,
   ItemDTO,
-  SurveyItemDTO
+  SurveyItemDTO,
+  SurveyFileDTO
 };

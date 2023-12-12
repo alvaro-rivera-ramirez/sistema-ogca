@@ -46,9 +46,31 @@ const searchUserAccessSurvey=(surveyId)=>new Promise(async(resolve, reject) => {
     }
 })
 
+const searchOneUserAccessSurvey=(surveyId,userId)=>new Promise(async(resolve, reject) => {
+    try {
+        const userAccess=await SurveyAccess.findOne({
+            where:{
+                survey_id:surveyId,
+                user_id:userId
+            }
+        });
 
+        if(!userAccess){
+            reject({
+                code:403,
+                message:"El usuario no tiene los permisos necesarios para ver la ficha."
+            })
+            return;
+        }
+
+        resolve(userAccess)
+    } catch (error) {
+        reject(error);
+    }
+})
 
 module.exports={
     bulkCreateAccess,
-    searchUserAccessSurvey
+    searchUserAccessSurvey,
+    searchOneUserAccessSurvey
 }
